@@ -1,8 +1,3 @@
-/*
-    给定一个正整数m，将其分解为多个数组[a1,a2,...,an]，数组和Sn=m，且an>a(n-1),a1>=1
-    比如m=10，可分解为[1,9]/[1,2,3,4]/[2,3,5]
-*/
-
 #include<algorithm>
 #include<vector>
 #include<stack>
@@ -29,6 +24,10 @@ namespace lxj{
 
     /*****************************算法部分**********************************/
     /******************在数 1~(n-1) 之间，找出所有组合，其元素相加总和为 n *********************************/
+    /*
+    给定一个正整数m，将其分解为多个数组[a1,a2,...,an]，数组和Sn=m，且an>a(n-1),a1>=1
+    比如m=10，可分解为[1,9]/[1,2,3,4]/[2,3,5]
+    */
     std::vector<std::vector<int>> valueDecom(int startIndex, int endIndex){
         std::vector<std::vector<int>> vvi;
         std::stack<int> memoryStack, resolveStack;
