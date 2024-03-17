@@ -607,6 +607,61 @@ namespace lxj{
         return result;
     }
 
+    //18. 四数之和
+    /*给你一个由 n 个整数组成的数组 nums ，和一个目标值 target 。请你找出并返回满足下述全部条件且不重复的四元组 
+    [nums[a], nums[b], nums[c], nums[d]] （若两个四元组元素一一对应，则认为两个四元组重复）：
+
+    0 <= a, b, c, d < n
+    a、b、c 和 d 互不相同
+    nums[a] + nums[b] + nums[c] + nums[d] == target
+
+    你可以按 任意顺序 返回答案 。*/
+    const std::vector<std::vector<int>> fourSum(std::vector<int>& nums, int target) {
+        std::vector<std::vector<int>> result;
+        std::sort(nums.begin(), nums.end());
+
+        for(int k=0; k!=nums.size(); k++){
+            //剪枝处理
+            if(nums[k]>target && nums[k]>=0){
+                break;
+            }
+            //对nums[k]去重
+            if(k>0 && nums[k]==nums[k-1]){
+                continue;
+            }
+            for(int i=k+1; i!=nums.size(); i++){
+                //2级剪枝处理
+                if(nums[k]+nums[i]>target && nums[i]>=0){
+                    break;
+                }
+                //对nums[i]去重
+                if(i>k+1 && nums[i]==nums[i-1]){
+                    continue;
+                }
+
+                unsigned int left=i+1;
+                unsigned int right=nums.size()-1;
+                while(left<right){
+                    if((long)nums[k]+nums[i]+nums[left]+nums[right]>target){
+                        right--;
+                    }
+                    else if((long)nums[k]+nums[i]+nums[left]+nums[right]<target){
+                        left++;
+                    }
+                    else{
+                        result.push_back(std::vector{nums[k],nums[i],nums[left],nums[right]});
+                        while(left<right && nums[right]==nums[right-1]) right--;
+                        while(left<right && nums[left]==nums[left+1])   left++;
+
+                        right--;
+                        left++;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     //202. 快乐数
     /*编写一个算法来判断一个数 n 是不是快乐数。
 
@@ -670,6 +725,119 @@ namespace lxj{
         return true;
     }
 
+    //344. 反转字符串
+    /*编写一个函数，其作用是将输入的字符串反转过来。输入字符串以字符数组 s 的形式给出。
+    不要给另外的数组分配额外的空间，你必须原地修改输入数组、使用 O(1) 的额外空间解决这一问题。*/
+    void reverseString(std::vector<char>& s) {
+        if(s.size()<2)  return;
+
+        char c{};
+        int index=s.size()-1;
+        for(int i=0; i<std::floor(s.size()/2); i++){
+            c=s[i];
+            s[i]=s[index-i];
+            s[index-i]=c;
+        }
+    }
+
+    //541. 反转字符串 II
+    /*给定一个字符串 s 和一个整数 k，从字符串开头算起，每计数至 2k 个字符，就反转这 2k 字符中的前 k 个字符。
+    如果剩余字符少于 k 个，则将剩余字符全部反转。
+    如果剩余字符小于 2k 但大于或等于 k 个，则反转前 k 个字符，其余字符保持原样。
+    */
+    const std::string reverseStr(std::string s, int k) {
+        for(int a=0; a<s.size(); a+=2*k){
+            int i=a, j=a+k-1<s.size() ? a+k-1 : s.size();
+            char c{};
+            while(i<j){
+                c=s[i];
+                s[i]=s[j];
+                s[j]=c;
+                i++; j--;
+            }
+        }
+        return s;
+    }
+
+    //151. 反转字符串中的单词
+    /*给你一个字符串 s ，请你反转字符串中 单词 的顺序。
+
+    单词 是由非空格字符组成的字符串。s 中使用至少一个空格将字符串中的 单词 分隔开。
+    返回 单词 顺序颠倒且 单词 之间用单个空格连接的结果字符串。
+    注意：输入字符串 s中可能会存在前导空格、尾随空格或者单词间的多个空格。返回的结果字符串中，单词间应当仅用单个空格分隔，
+    且不包含任何额外的空格。*/
+    //这个在这里能跑，在LeetCode却失败
+    const std::string reverseWords(const std::string &s) {
+        std::string rs;
+        rs.reserve(s.size());
+        auto f=[&rs, s]( int i,  int j){
+            while(i<=j){
+                rs.push_back(s.at(i));
+                i++;
+            }
+            rs+=" ";
+        };
+
+        int wordHead=s.size()-1, wordTail=s.size()-1;
+        while(wordHead>=0){
+            while(wordHead>wordTail || (wordHead>0&&s[wordHead-1]!=' ') || s[wordHead]==' ') wordHead--;
+            while(wordTail+1<s.size() && s[wordTail+1]!=' ' || s[wordTail]==' ') wordTail--;
+            if(wordHead>=0 && wordHead<=wordTail)
+                f(wordHead,wordTail);
+            wordHead--;
+            wordTail--;
+        }
+        while(rs.back()==' ')
+            rs.pop_back();
+        return rs;
+    }
+    //在LeetCode上能跑的
+    const std::string reverseWords_1(std::string &s){
+        //删除多余的空格
+        int slow=0;
+        for(int i=0; i<s.size(); i++){
+            if(s[i]!=' '){
+                if(slow!=0) s[slow++]=' ';
+                while(i<s.size() && s[i]!=' '){
+                    s[slow++]=s[i++];
+                }
+            }
+        }
+        s.resize(slow);
+
+        //反转整个句子
+        std::reverse(s.begin(),s.end());
+
+        //反转单词
+        unsigned int wordHead=0,wordTail=0;
+        while(wordTail<s.size()){
+            while(wordHead>0 && s[wordHead-1]!=' ') wordHead++;
+            while(wordTail<s.size()-1 && (s[wordTail+1]!=' ')) wordTail++;
+            char c{};
+            for(int i=0; i<=std::floor((wordTail-wordHead)/2); i++){
+                c=s[wordHead+i];
+                s[wordHead+i]=s[wordTail-i];
+                s[wordTail-i]=c;
+            }
+
+            wordHead++;
+            wordTail++;
+        }
+
+        return s;
+    }
+
+    //KMP算法
+    //创建子串的前缀数组
+    const std::vector<unsigned short> next(const std::string &subStr){
+        std::vector<unsigned short> subVec;
+        subVec.reserve(subStr.size());
+
+        
+
+        return subVec;
+    }
+
 }
 
 namespace testFunc{
@@ -683,3 +851,9 @@ namespace testFunc{
         return head;
     }
 }
+
+/*
+Line 1053: Char 9: runtime error: addition of unsigned offset to 0x7fe6c07002c0 overflowed to 0x7fe6c07002bf (basic_string.h)
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior 
+/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/bits/basic_string.h:1062:9
+*/
